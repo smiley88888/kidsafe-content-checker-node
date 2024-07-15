@@ -1,4 +1,4 @@
-# KidSafe Content Checker
+# KidSafe Content Checker[Node]
 
 ## Summary
 The KidSafe Content Checker is an AI-powered tool designed to evaluate Text, Image, and Video content to determine if they contain potentially dangerous content for children.
