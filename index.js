@@ -1,9 +1,9 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const morgan = require("morgan");
-const { kidsafeRouter } = require("./routers/kidsafe_api");
-const logger = require("./logger");
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import morgan from "morgan";
+import { kidsafeRouter } from "./routers/kidsafe_api.js";
+import logger from "./logger.js";
 
 const app = express();
 const port = 8000;

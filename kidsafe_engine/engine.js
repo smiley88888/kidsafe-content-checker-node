@@ -1,14 +1,12 @@
-const axios = require("axios");
-const { Configuration, OpenAIApi } = require("openai");
-const { readYouTube } = require("./read_youtube");
-const config = require("../config");
-const logger = require("../logger");
+import axios from "axios";
+import { OpenAI } from "openai";
+import { readYouTube } from "./read_youtube.js";
+import { config } from "../config.js";
+import logger from "../logger.js";
 
-const openai = new OpenAIApi(
-  new Configuration({
-    apiKey: config.OPENAI_API_KEY,
-  })
-);
+const client = new OpenAI({
+  apiKey: config.OPENAI_API_KEY, // This is the default and can be omitted
+});
 
 const systemPrompt = 'Reply briefly to the following question: "Yes" or "No"';
 
@@ -112,15 +110,15 @@ async function checkText(text) {
 
   try {
     for (const { category, question } of textQuestions) {
-      const response = await openai.createChatCompletion({
+      const response = await client.chat.completions.create({
         model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `${text}\n${question}` },
         ],
       });
-      const answer = response.data.choices[0].message.content.trim();
-      logger.debug(`response: ${answer}`);
+      const answer = response.choices[0].message.content.trim();
+      logger.debug(`response: ${category} = ${answer}`);
 
       if (answer.includes("Yes")) {
         result[category] = "Yes";
@@ -128,7 +126,7 @@ async function checkText(text) {
     }
     return { message: "success", result };
   } catch (error) {
-    logger.critical(`An error occurred: ${error}`);
+    logger.error(`An error occurred: ${error}`);
     return { message: "failed", result: "Could not analyze" };
   }
 }
@@ -149,7 +147,7 @@ async function checkImage(imageUrl) {
 
   try {
     for (const { category, question } of imageQuestions) {
-      const response = await openai.createChatCompletion({
+      const response = await client.chat.completions.create({
         model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
@@ -166,8 +164,8 @@ async function checkImage(imageUrl) {
           },
         ],
       });
-      const answer = response.data.choices[0].message.content.trim();
-      logger.debug(`response: ${answer}`);
+      const answer = response.choices[0].message.content.trim();
+      logger.debug(`response: ${category} = ${answer}`);
 
       if (answer.includes("Yes")) {
         result[category] = "Yes";
@@ -175,7 +173,7 @@ async function checkImage(imageUrl) {
     }
     return { message: "success", result };
   } catch (error) {
-    logger.critical(`An error occurred: ${error}`);
+    logger.error(`An error occurred: ${error}`);
     return { message: "failed", result: "Could not analyze" };
   }
 }
@@ -203,15 +201,15 @@ async function checkVideo(videoUrl) {
 
   try {
     for (const { category, question } of textQuestions) {
-      const response = await openai.createChatCompletion({
+      const response = await client.chat.completions.create({
         model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `${text}\n${question}` },
         ],
       });
-      const answer = response.data.choices[0].message.content.trim();
-      logger.debug(`response: ${answer}`);
+      const answer = response.choices[0].message.content.trim();
+      logger.debug(`response: ${category} = ${answer}`);
 
       if (answer.includes("Yes")) {
         result[category] = "Yes";
@@ -219,9 +217,9 @@ async function checkVideo(videoUrl) {
     }
     return { message: "success", result };
   } catch (error) {
-    logger.critical(`An error occurred: ${error}`);
+    logger.error(`An error occurred: ${error}`);
     return { message: "failed", result: "Could not analyze" };
   }
 }
 
-module.exports = { checkText, checkImage, checkVideo };
+export { checkText, checkImage, checkVideo };

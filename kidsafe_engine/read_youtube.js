@@ -1,5 +1,5 @@
-const { google } = require("googleapis");
-const config = require("../config");
+import { google } from "googleapis";
+import { config } from "../config.js";
 
 const youtube = google.youtube({
   version: "v3",
@@ -21,4 +21,4 @@ async function readYouTube(url) {
   return `${title}\n${description}`;
 }
 
-module.exports = { readYouTube };
+export { readYouTube };
