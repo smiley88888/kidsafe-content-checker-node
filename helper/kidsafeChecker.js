@@ -2,7 +2,7 @@ const { OpenAI } = require("openai");
 const { readYouTube } = require("./readYoutube.js");
 const { config } = require("../config.js");
 const logger = require("../logger.js");
-const { Youtube } = require("../model/index");
+const { Youtube } = require("../models/index");
 const {
   systemPrompt,
   textQuestions,

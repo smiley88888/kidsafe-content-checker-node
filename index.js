@@ -7,7 +7,7 @@ const logger = require("./logger.js");
 const { connectDatabase } = require("./config/mongoose.js");
 
 const app = express();
-const port = 8000;
+const port = 8001;
 const IP_address = "0.0.0.0";
 
 // Logging
@@ -53,16 +53,22 @@ app.use((err, req, res, next) => {
 
 connectDatabase()
   .then(() => {
-    app.listen(port, () => {
-      logger.debug(`Server is running on http://localhost:${port}`);
+    // Start server
+    const server = app.listen(port, IP_address, () => {
+      logger.info("----- start kidsafe content checker service -----");
+      logger.info(`Server is running on http://${IP_address}:${port}`);
+    });
+
+    server.on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        logger.error(
+          `Port ${port} is already in use. Please use a different port.`
+        );
+      } else {
+        logger.error("Server error:", err);
+      }
     });
   })
   .catch((err) => {
     logger.error(`Failed to connect to database ${err}`);
   });
-
-// Start server
-app.listen(port, IP_address, () => {
-  logger.info("----- start kidsafe content checker service -----");
-  logger.info(`Server is running on http://${IP_address}:${port}`);
-});
