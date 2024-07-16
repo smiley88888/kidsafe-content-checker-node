@@ -1,112 +1,34 @@
-import axios from "axios";
-import { OpenAI } from "openai";
-import { readYouTube } from "./read_youtube.js";
-import { config } from "../config.js";
-import logger from "../logger.js";
+const { OpenAI } = require("openai");
+const { readYouTube } = require("./readYoutube.js");
+const { config } = require("../config.js");
+const logger = require("../logger.js");
+const { Youtube } = require("../model/index");
+const {
+  systemPrompt,
+  textQuestions,
+  imageQuestions,
+  videoQuestions,
+} = require("../constants/prompt.js");
 
 const client = new OpenAI({
   apiKey: config.OPENAI_API_KEY, // This is the default and can be omitted
 });
 
-const systemPrompt = 'Reply briefly to the following question: "Yes" or "No"';
-
-const textQuestions = [
-  {
-    category: "educational",
-    question: "Does this text include any educational contents for kids?",
-  },
-  {
-    category: "entertainment",
-    question: "Does this text include any entertainment contents for kids?",
-  },
-  {
-    category: "nudity",
-    question: "Does this text include any nudity contents for kids?",
-  },
-  {
-    category: "sexuality",
-    question: "Does this text include any sexuality contents for kids?",
-  },
-  {
-    category: "religion",
-    question: "Does this text include any religion contents for kids?",
-  },
-  {
-    category: "controversial topics",
-    question:
-      "Does this text include any controversial topics contents for kids?",
-  },
-];
-
-const imageQuestions = [
-  {
-    category: "educational",
-    question: "Does this image include any educational contents for kids?",
-  },
-  {
-    category: "entertainment",
-    question: "Does this image include any entertainment contents for kids?",
-  },
-  {
-    category: "nudity",
-    question: "Does this image include any nudity contents for kids?",
-  },
-  {
-    category: "sexuality",
-    question: "Does this image include any sexuality contents for kids?",
-  },
-  {
-    category: "religion",
-    question: "Does this image include any religion contents for kids?",
-  },
-  {
-    category: "controversial topics",
-    question:
-      "Does this image include any controversial topics contents for kids?",
-  },
-];
-
-const videoQuestions = [
-  {
-    category: "educational",
-    question: "Does this text include any educational contents for kids?",
-  },
-  {
-    category: "entertainment",
-    question: "Does this text include any entertainment contents for kids?",
-  },
-  {
-    category: "nudity",
-    question: "Does this text include any nudity contents for kids?",
-  },
-  {
-    category: "sexuality",
-    question: "Does this text include any sexuality contents for kids?",
-  },
-  {
-    category: "religion",
-    question: "Does this text include any religion contents for kids?",
-  },
-  {
-    category: "controversial topics",
-    question:
-      "Does this text include any controversial topics contents for kids?",
-  },
-];
+const initialValue = {
+  educational: "No",
+  entertainment: "No",
+  nudity: "No",
+  sexuality: "No",
+  religion: "No",
+  "controversial topics": "No",
+};
 
 async function checkText(text) {
   if (!text) {
     return { message: "failed", result: "Inputs are invalid" };
   }
 
-  const result = {
-    educational: "No",
-    entertainment: "No",
-    nudity: "No",
-    sexuality: "No",
-    religion: "No",
-    "controversial topics": "No",
-  };
+  let result = initialValue;
 
   try {
     for (const { category, question } of textQuestions) {
@@ -136,14 +58,7 @@ async function checkImage(imageUrl) {
     return { message: "failed", result: "Inputs are invalid" };
   }
 
-  const result = {
-    educational: "No",
-    entertainment: "No",
-    nudity: "No",
-    sexuality: "No",
-    religion: "No",
-    "controversial topics": "No",
-  };
+  let result = initialValue;
 
   try {
     for (const { category, question } of imageQuestions) {
@@ -190,14 +105,7 @@ async function checkVideo(videoUrl) {
     return { message: "failed", result: "Inputs are invalid" };
   }
 
-  const result = {
-    educational: "No",
-    entertainment: "No",
-    nudity: "No",
-    sexuality: "No",
-    religion: "No",
-    "controversial topics": "No",
-  };
+  let result = initialValue;
 
   try {
     for (const { category, question } of textQuestions) {
@@ -215,6 +123,14 @@ async function checkVideo(videoUrl) {
         result[category] = "Yes";
       }
     }
+
+    // save data into db
+    const data = new Youtube({
+      website_link: videoUrl,
+      result: JSON.stringify(result),
+    });
+    await data.save();
+
     return { message: "success", result };
   } catch (error) {
     logger.error(`An error occurred: ${error}`);
@@ -222,4 +138,4 @@ async function checkVideo(videoUrl) {
   }
 }
 
-export { checkText, checkImage, checkVideo };
+module.exports = { checkText, checkImage, checkVideo };

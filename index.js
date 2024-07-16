@@ -1,9 +1,10 @@
-import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
-import morgan from "morgan";
-import { kidsafeRouter } from "./routers/kidsafe_api.js";
-import logger from "./logger.js";
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const morgan = require("morgan");
+const kidsafeRouter = require("./routers/kidsafe.js");
+const logger = require("./logger.js");
+const { connectDatabase } = require("./config/mongoose.js");
 
 const app = express();
 const port = 8000;
@@ -49,6 +50,16 @@ app.use((err, req, res, next) => {
     next(err);
   }
 });
+
+connectDatabase()
+  .then(() => {
+    app.listen(port, () => {
+      logger.debug(`Server is running on http://localhost:${port}`);
+    });
+  })
+  .catch((err) => {
+    logger.error(`Failed to connect to database ${err}`);
+  });
 
 // Start server
 app.listen(port, IP_address, () => {

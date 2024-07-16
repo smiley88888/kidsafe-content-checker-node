@@ -1,14 +1,11 @@
-import express from "express";
-import { checkText, checkImage, checkVideo } from "../kidsafe_engine/engine.js";
-import logger from "../logger.js";
+const {
+  checkText,
+  checkImage,
+  checkVideo,
+} = require("../helper/kidsafeChecker.js");
+const logger = require("../logger.js");
 
-const router = express.Router();
-
-router.get("/", (req, res) => {
-  res.json({ message: "KidSafe Content Checker API" });
-});
-
-router.post("/text", async (req, res) => {
+exports.analyzeText = async (req, res) => {
   try {
     const incomingData = req.body;
 
@@ -22,9 +19,9 @@ router.post("/text", async (req, res) => {
     logger.error("Inputs are invalid");
     res.status(400).json({ message: "failed", result: "Inputs are invalid" });
   }
-});
+};
 
-router.post("/image", async (req, res) => {
+exports.analyzeImage = async (req, res) => {
   try {
     const incomingData = req.body;
 
@@ -38,9 +35,9 @@ router.post("/image", async (req, res) => {
     logger.error("Inputs are invalid");
     res.status(400).json({ message: "failed", result: "Inputs are invalid" });
   }
-});
+};
 
-router.post("/video", async (req, res) => {
+exports.analyzeVideo = async (req, res) => {
   try {
     const incomingData = req.body;
 
@@ -54,6 +51,4 @@ router.post("/video", async (req, res) => {
     logger.error("Inputs are invalid");
     res.status(400).json({ message: "failed", result: "Inputs are invalid" });
   }
-});
-
-export { router as kidsafeRouter };
+};
