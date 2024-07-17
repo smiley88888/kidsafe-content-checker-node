@@ -11,6 +11,7 @@ const config = {
   GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
   MONGODB_URI: process.env.MONGODB_URI,
   DBNAME: process.env.DBNAME,
+  DEEPGRAM_API_KEY: process.env.DEEPGRAM_API_KEY,
 };
 
 module.exports = { config };
